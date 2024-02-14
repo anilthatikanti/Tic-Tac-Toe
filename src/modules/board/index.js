@@ -1,6 +1,9 @@
 import { React, useState } from "react";
 import { Square } from "../button/index";
-import { calculateWinner,getUserNextStepIndex } from "../../functions/funcitons";
+import {
+  calculateWinner,
+  getUserNextStepIndex,
+} from "../../functions/funcitons";
 
 export const Board = () => {
   const [xIsNext, setXIsNext] = useState(true);
@@ -13,16 +16,16 @@ export const Board = () => {
     const nextSquares = [...squares];
     if (xIsNext) {
       nextSquares[i] = "X";
-      let index = getUserNextStepIndex(nextSquares,i)
-      console.log('index',index)
-      nextSquares[index] = "O";
-    // } else {
-    //   nextSquares[i] = "O";
+      if (!calculateWinner(nextSquares)) {
+        let index = getUserNextStepIndex(nextSquares, i);
+        nextSquares[index] = "O";
+      }
+      // } else {
+      //   nextSquares[i] = "O";
     }
     setSquares(nextSquares);
     // setXIsNext(!xIsNext);
   }
-
 
   const winner = calculateWinner(squares);
   let status = winner
