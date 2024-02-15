@@ -8,32 +8,63 @@ import {
 export const Board = () => {
   const [xIsNext, setXIsNext] = useState(true);
   const [squares, setSquares] = useState(Array(9).fill(null));
+  const [playWithBot, setMatchWithBot] = useState(false);
+  const [botLoading, setBotLoading] = useState(false);
 
   function handleClick(i) {
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares) || squares[i] || botLoading) {
+      console.log("calculateWinner(squares)", calculateWinner(squares));
       return;
     }
     const nextSquares = [...squares];
     if (xIsNext) {
+      console.log("xIsNext", xIsNext);
       nextSquares[i] = "X";
-      if (!calculateWinner(nextSquares)) {
-        let index = getUserNextStepIndex(nextSquares, i);
-        nextSquares[index] = "O";
+      if (
+        playWithBot &&
+        !calculateWinner(nextSquares) &&
+        nextSquares.some((x) => x === null)
+      ) {
+        setBotLoading(!botLoading);
+        // Delay before bot's move
+        setTimeout(() => {
+          let index = getUserNextStepIndex(nextSquares);
+          nextSquares[index] = "O";
+          console.log("nextSquares", nextSquares);
+          // setSquares([...nextSquares]); // Update state with new squares array
+          setBotLoading(false); // End bot loading state
+          setSquares(nextSquares);
+        }, 1000);
       }
-      // } else {
-      //   nextSquares[i] = "O";
+    } else {
+      nextSquares[i] = "O";
     }
     setSquares(nextSquares);
-    // setXIsNext(!xIsNext);
+    if (!playWithBot) {
+      setXIsNext(!xIsNext);
+    }
   }
+
+  function playwithBotFunction() {
+    setMatchWithBot(!playWithBot);
+  }
+  // } else {
+  //   nextSquares[i] = "O";
 
   const winner = calculateWinner(squares);
   let status = winner
     ? "Winner: " + winner
-    : "Next player: " + (xIsNext ? "X" : "O");
+    : squares.every((x) => x !== null)
+    ? "Game Tie"
+    : "Next player: " + (botLoading || !xIsNext ? "O" : "X");
 
   return (
     <>
+      <p>{botLoading && "Thinking..."}</p>
+      {!playWithBot && (
+        <button onClick={playwithBotFunction}>Play with bot</button>
+      )}
+
       <h1>{status}</h1>
       <div style={{ display: "flex", flexWrap: "wrap", width: "150px" }}>
         {squares.map((_, i) => {

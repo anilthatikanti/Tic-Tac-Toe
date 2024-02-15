@@ -18,7 +18,7 @@ export function calculateWinner(squares) {
   return null;
 }
 
-export function getUserNextStepIndex(squares) {
+export function getUserNextStepIndex(squares, userSelectedIndex) {
   // Winning lines
   const lines = [
     [0, 1, 2],
@@ -31,63 +31,84 @@ export function getUserNextStepIndex(squares) {
     [2, 4, 6],
   ];
 
-  // Defensive strategy: Block user's potential winning lines
+  let defensiveMode = false;
+
+  // Check for defensive moves or immediate wins
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
-    if (squares[a] === "X" && squares[b] === "X" && squares[c] === null) {
-      return c; // Block user's win on this line
+    const line = [squares[a], squares[b], squares[c]];
+
+    // Defensive move: Block user's potential winning lines
+    if (line.filter((x) => x === "X").length === 2 && line.includes(null)) {
+      const emptyIndex = line.indexOf(null);
+      return lines[i][emptyIndex]; // Return the index in the original array
+    }
+
+    // Offensive move: Check for immediate win
+    if (line.filter((x) => x === "O").length === 2 && line.includes(null)) {
+      const emptyIndex = line.indexOf(null);
+      return lines[i][emptyIndex]; // Return the index in the original array
+    }
+
+    // Switch to defensive mode if opponent has two 'O's in any row
+    if (line.filter((x) => x === "O").length === 2 && line.includes(null)) {
+      defensiveMode = true;
     }
   }
-  // Offensive strategy: Check for immediate win or fork opportunities
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
 
-    // Check for immediate win
-    if (squares[a] === "o" && squares[b] === "o" && squares[c] === null) {
-      return c; // Win on this line
-    }
-
-    // Check for fork (creating two potential winning lines)
-    if (squares[a] === "o" && squares[b] === null && squares[c] === null) {
-      if (squares[3] === null || squares[3] === "o") {
-        return b; // Create fork on lines [a,b,c] and [a,b,3]
-      } else if (squares[4] === null || squares[4] === "o") {
-        return c; // Create fork on lines [a,b,c] and [a,4,c]
-      }
-    } else if (
-      squares[a] === null &&
-      squares[b] === "o" &&
-      squares[c] === null
-    ) {
-      if (squares[4] === null || squares[4] === "o") {
-        return a; // Create fork on lines [a,b,c] and [a,4,c]
-      } else if (squares[5] === null || squares[5] === "O") {
-        return c; // Create fork on lines [a,b,c] and [a,5,c]
-      }
-    } else if (
-      squares[a] === null &&
-      squares[b] === null &&
-      squares[c] === "O"
-    ) {
-      if (squares[2] === null || squares[2] === "O") {
-        return a; // Create fork on lines [a,b,c] and [a,2,c]
-      } else if (squares[1] === null || squares[1] === "O") {
-        return b; // Create fork on lines [a,b,c] and [a,1,b]
+  // If in defensive mode, return index of remaining 'O' for a win
+  if (defensiveMode) {
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      const line = [squares[a], squares[b], squares[c]];
+      if (line.filter((x) => x === "O").length === 2 && line.includes(null)) {
+        const emptyIndex = line.indexOf(null);
+        return lines[i][emptyIndex]; // Return the index in the original array
       }
     }
   }
 
   // Center or corner strategy: Play in the center or a corner if available
+  // if (squares[4] === null) {
+  //   return 4; // Center
+  // } else if (squares[0] === null) {
+  //   return 0; // Top left corner
+  // } else if (squares[2] === null) {
+  //   return 2; // Top right corner
+  // } else if (squares[6] === null) {
+  //   return 6; // Bottom left corner
+  // } else if (squares[8] === null) {
+  //   return 8; // Bottom right corner
+  // }
+
+  //Center  strategy: Play in the center  if available
   if (squares[4] === null) {
     return 4; // Center
-  } else if (squares[0] === null) {
-    return 0; // Top left corner
-  } else if (squares[2] === null) {
-    return 2; // Top right corner
-  } else if (squares[6] === null) {
-    return 6; // Bottom left corner
-  } else if (squares[8] === null) {
-    return 8; // Bottom right corner
+  }
+
+  let userSelectexMatchingItems = lines.filter((x) =>
+    x.includes(userSelectedIndex)
+  );
+  if (userSelectexMatchingItems.length) {
+    for (let i = 0; i < userSelectexMatchingItems.length; i++) {
+      const [a, b, c] = lines[i];
+      const line = [squares[a], squares[b], squares[c]];
+      if (line.filter((x) => x === "O").length === 2 && line.includes(null)) {
+        const emptyIndex = line.indexOf(null);
+        return lines[i][emptyIndex]; // Return the index in the original array
+      }
+    }
+  } else {
+    // corner strategy: Play in the  corner if available
+    if (squares[0] === null) {
+      return 0; // Top left corner
+    } else if (squares[2] === null) {
+      return 2; // Top right corner
+    } else if (squares[6] === null) {
+      return 6; // Bottom left corner
+    } else if (squares[8] === null) {
+      return 8; // Bottom right corner
+    }
   }
 
   // Random fallback: Choose any available empty slot
