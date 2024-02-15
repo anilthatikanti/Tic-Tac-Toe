@@ -13,12 +13,10 @@ export const Board = () => {
 
   function handleClick(i) {
     if (calculateWinner(squares) || squares[i] || botLoading) {
-      console.log("calculateWinner(squares)", calculateWinner(squares));
       return;
     }
     const nextSquares = [...squares];
     if (xIsNext) {
-      console.log("xIsNext", xIsNext);
       nextSquares[i] = "X";
       if (
         playWithBot &&
@@ -30,7 +28,6 @@ export const Board = () => {
         setTimeout(() => {
           let index = getUserNextStepIndex(nextSquares);
           nextSquares[index] = "O";
-          console.log("nextSquares", nextSquares);
           // setSquares([...nextSquares]); // Update state with new squares array
           setBotLoading(false); // End bot loading state
           setSquares(nextSquares);
@@ -61,7 +58,7 @@ export const Board = () => {
   return (
     <>
       <p>{botLoading && "Thinking..."}</p>
-      {!playWithBot && (
+      {!playWithBot && squares.every((x) => x === null) && (
         <button onClick={playwithBotFunction}>Play with bot</button>
       )}
 
