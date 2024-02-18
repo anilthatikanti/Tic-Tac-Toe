@@ -26,7 +26,7 @@ export const Board = () => {
         setBotLoading(!botLoading);
         // Delay before bot's move
         setTimeout(() => {
-          let index = getUserNextStepIndex(nextSquares);
+          let index = getUserNextStepIndex(nextSquares,i);
           nextSquares[index] = "O";
           // setSquares([...nextSquares]); // Update state with new squares array
           setBotLoading(false); // End bot loading state
