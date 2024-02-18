@@ -33,23 +33,31 @@ export function getUserNextStepIndex(squares, userSelectedIndex) {
 
   let defensiveMode = false;
 
-  // Check for defensive moves or immediate wins
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     const line = [squares[a], squares[b], squares[c]];
-
-    // Defensive move: Block user's potential winning lines
-    if (line.filter((x) => x === "X").length === 2 && line.includes(null)) {
-      const emptyIndex = line.indexOf(null);
-      return lines[i][emptyIndex]; // Return the index in the original array
-    }
-
     // Offensive move: Check for immediate win
     if (line.filter((x) => x === "O").length === 2 && line.includes(null)) {
       const emptyIndex = line.indexOf(null);
       return lines[i][emptyIndex]; // Return the index in the original array
     }
+  }
 
+  // Check for defensive moves or immediate wins
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    const line = [squares[a], squares[b], squares[c]];
+    
+    // // Offensive move: Check for immediate win
+    // if (line.filter((x) => x === "O").length === 2 && line.includes(null)) {
+    //   const emptyIndex = line.indexOf(null);
+    //   return lines[i][emptyIndex]; // Return the index in the original array
+    // }
+    // Defensive move: Block user's potential winning lines
+    if (line.filter((x) => x === "X").length === 2 && line.includes(null)) {
+      const emptyIndex = line.indexOf(null);
+      return lines[i][emptyIndex]; // Return the index in the original array
+    }
     // Switch to defensive mode if opponent has two 'O's in any row
     if (line.filter((x) => x === "O").length === 2 && line.includes(null)) {
       defensiveMode = true;
@@ -81,8 +89,17 @@ export function getUserNextStepIndex(squares, userSelectedIndex) {
   //   return 8; // Bottom right corner
   // }
 
-  //Center  strategy: Play in the center  if available
-  if (squares[4] === null) {
+/** Center  strategy: Play in the center  if available but this is only for first step
+ * first we need to check the center whether it is empty or not 
+ * second the user selected corner in first step or not because who have more probability to win
+ * third select center if there is no corner value && squares.filter((x) => x === "X").length === 1
+*/
+  if (squares[4] === null ) {
+    // let cornerConfiremIndex = squares.findIndex(x=>x==='X')
+    // if([0,2,6,8].includes(cornerConfiremIndex)){
+    //   return 8 - cornerConfiremIndex
+    // }
+    //Center  strategy: Play in the center  if available
     return 4; // Center
   }
 
@@ -99,6 +116,18 @@ export function getUserNextStepIndex(squares, userSelectedIndex) {
       }
     }
   } else {
+    if(squares[4] === 'O'){
+
+      if (squares[1] === null) {
+        return 1; // Top left corner
+      } else if (squares[3] === null) {
+        return 3; // Top right corner
+      } else if (squares[5] === null) {
+        return 5; // Bottom left corner
+      } else if (squares[7] === null) {
+        return 7; // Bottom right corner
+      }
+    }
     // corner strategy: Play in the  corner if available
     if (squares[0] === null) {
       return 0; // Top left corner
